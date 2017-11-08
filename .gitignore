@@ -1,0 +1,14 @@
+*.egg-info
+*.idea
+*.pyc
+*.swp
+*coverage.*
+.cache
+.coverage
+.mbed_cloud_config.json
+.tox
+build/
+dist/
+docs/build/
+results/
+venv/
