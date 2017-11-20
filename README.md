@@ -19,3 +19,9 @@
 `mbed detect` to see which target is connect to the board
 
 `mbedls -l` to list all supported targets
+
+## Using uTensor-cli
+
+```
+python utensor/utensor.py graph_out/quantized_graph.pb
+```
