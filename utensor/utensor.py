@@ -1,4 +1,5 @@
 import argparse
+from jinja2 import Template
 import os
 import shutil
 import sys
@@ -27,6 +28,17 @@ def process_graph(fName):
         if i.type == "Const":
             inspector.snap(i.name, path=bName)
 
+def generate(fName, numInputs):
+    bName = os.path.splitext(os.path.basename(fName))[0]
+    print("Generating: " + bName + ".hpp")
+    with open(os.path.join("templates", "header.hpp")) as fp:
+        t = Template(fp.read())
+        print(t.render(name=bName, num_inputs=numInputs))
+    
+    print("Generating: " + bName + ".cpp")
+    with open(os.path.join("templates", "code.cpp")) as fp:
+        t = Template(fp.read())
+        print(t.render(name=bName, num_inputs=numInputs))
 
 
 def main():
@@ -35,6 +47,7 @@ def main():
         print "verbosity turned on"
 
     process_graph(args.file)
+    generate(args.file, 3)
 
 if __name__ == '__main__':
     main()
