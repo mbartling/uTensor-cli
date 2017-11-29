@@ -11,6 +11,7 @@ parser.add_argument("-v", "--verbose", help="increase output verbosity",
 parser.add_argument("-q", "--quantize", help="Quantize graph", action="store_true")
 parser.add_argument("-o", help="override output name", metavar="NAME")
 parser.add_argument("file", help="input protobuf file")
+parser.add_argument('-m','--model-outputs', nargs='+', help='<Required> select model outputs to dump to uTensor', required=True, dest="mOutputs", metavar="var")
 
 def process_graph(fName):
     graph = load_graph(fName, name="")
@@ -46,6 +47,8 @@ def main():
     if args.verbose:
         print "verbosity turned on"
 
+    print(args.mOutputs)
+    sys.exit(-1)
     process_graph(args.file)
     generate(args.file, 3)
 
