@@ -29,6 +29,12 @@ def process_graph(fName):
         if i.type == "Const":
             inspector.snap(i.name, path=bName)
 
+def generate_output_graph(tfGraph, outVar):
+    """ Given an output variable generate a uTensor graph.
+        Basic idea: build a stack of operations backwards from an output variable to input variables.
+        Do breadth first graph traversal.
+    """
+    pass
 def generate(fName, numInputs):
     bName = os.path.splitext(os.path.basename(fName))[0]
     print("Generating: " + bName + ".hpp")
