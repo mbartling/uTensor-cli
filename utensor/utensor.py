@@ -3,7 +3,7 @@ from jinja2 import Template
 import os
 import shutil
 import sys
-from view_node import GraphInspector, load_graph
+from tf_viewer import GraphInspector, load_graph
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose", help="increase output verbosity",
