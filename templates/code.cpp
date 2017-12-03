@@ -11,5 +11,7 @@ namespace {{ name }} {
 
     }
 
-    {% for definition in definitions %}{{definition}}{% endfor %}
+    {% for definition in definitions %}
+    {{definition}}
+    {% endfor %}
 }

@@ -9,7 +9,9 @@ namespace {{ name }} {
             Model();
             ~Model();
 
-            {% for declaration in declarations %}{{declaration}}{% endfor %}
+            {% for declaration in declarations %}
+            {{declaration}}
+            {% endfor %}
 
     };
 }
