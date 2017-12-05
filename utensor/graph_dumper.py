@@ -1,5 +1,6 @@
 from jinja2 import Template
 from tf_viewer import GraphInspector, load_graph
+from copy import deepcopy
 import glob
 import os
 import re
@@ -47,15 +48,17 @@ class GraphDumper:
         obj["opStack"] = self.opStack
         obj["inputs"] = self.inputList
         obj["intermediates"] = {}
+        obj["operations"] = []
 
         for i in self.get_intermediate_templates():
             obj["intermediates"][i["name"]] = i
+        for i in self.get_op_templates():
+            obj["operations"].append(i)
     
         return obj
 
     def _find_inputs(self, graph, name):
         p = graph.get_operation_by_name(name)
-        print p.node_def
         # Constants should be exposed to the Model
         if p.type == "Const":
             self.constList.append(p)
@@ -67,9 +70,6 @@ class GraphDumper:
             # Placeholders will be a part of the function call
             self.opStack.append(p)
 
-        print list(p.inputs)
-        print list(p.outputs)
-        print "-------------"
         for i in p.inputs:
             tensor = graph.get_tensor_by_name(i.name)
             if i.name not in self.hitList:
@@ -96,7 +96,6 @@ class GraphDumper:
 
     def get_intermediate_templates(self):
         files = glob.glob("%s/*/*/*" % self.bName)
-        print files
         for i in self.intermediateList:
             obj = {}
             obj["name"] = clean_name(i.name)
@@ -112,11 +111,22 @@ class GraphDumper:
                     obj["definition"] = t.render(t_name=obj["name"], t_type=get_c_type(i.dtype.name))
 
             yield obj
+    def get_op_templates(self):
+        # Work backwards
+        while self.opStack:
+            template = ''
+            op = self.opStack.pop()
+            opType = "%sOp" % op.type
+            inputs = map(lambda x: clean_name(x.name), list(op.inputs))
+            outputs = map(lambda x: clean_name(x.name), list(op.outputs))
+            #m_types = []
+            #m_types.extend(map(lambda x: get_c_type(x.dtype), list(x.inputs)))
+            #m_types.extend(map(lambda x: get_c_type(x.dtype), list(x.outputs)))
+            with open("templates/op.tmplt") as fp:
+                t = Template(fp.read())
+                template = t.render(op=opType, inputs=inputs, outputs=outputs, opName=clean_name(op.name))
 
-    def get_inputs(self):
-        print "=========Input List================="
-        for i in self.inputList:
-            print i.name
+            yield template
 
 if __name__ == '__main__':
     import pprint
@@ -125,12 +135,7 @@ if __name__ == '__main__':
     
     G = GraphDumper(sys.argv[1])
     obj = G.find_inputs(graph, sys.argv[2])
-#    g = obj["opStack"]
 #    
-#    print "==========OP stack============"
-#    while g:
-#        op = g.pop()
-#        print op.node_def
 #    
 #    print "=========Intermediate LIST=========="
 #    for i in G.get_intermediate_templates():
@@ -139,3 +144,8 @@ if __name__ == '__main__':
 
     pprint.pprint(obj)
 
+    print "==========OP stack============"
+    g = obj["opStack"]
+    while g:
+        op = g.pop()
+        print op.node_def

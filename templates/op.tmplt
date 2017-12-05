@@ -1,0 +1,1 @@
+ctx.push(new {{op}}(), { {% for m in inputs %}"{{ m }}"{{ "," if not loop.last }}{% endfor %} }, { {% for m in outputs %}"{{ m }}"{{ "," if not loop.last }}{% endfor %} }); //{{ opName }}

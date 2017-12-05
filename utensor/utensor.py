@@ -40,18 +40,20 @@ def generate_output_graph(graph, fName, outVar):
     declaration = ''
     definition = ''
     inputs = []
+    input_tensors = []
 
     G = GraphDumper(fName)
     obj = G.find_inputs(graph, outVar)
     for m_input in obj["inputs"]:
         inputs.append(m_input.name)
+        input_tensors.append(clean_name(m_input.outputs[0].name))
 
     with open(os.path.join("templates", "function_decl.tmplt")) as fp:
         t = Template(fp.read())
         declaration = t.render(decl_name=outVar, num_inputs=len(inputs), inputs=inputs)
     with open(os.path.join("templates", "function_def.tmplt")) as fp:
         t = Template(fp.read())
-        definition = t.render(def_name=outVar, num_inputs=len(inputs), inputs=inputs, output=clean_name(graph.get_operation_by_name(outVar).outputs[0].name))
+        definition = t.render(def_name=outVar, num_inputs=len(inputs), inputs=input_tensors, output=clean_name(graph.get_operation_by_name(outVar).outputs[0].name), graphOps=obj["operations"])
     return (declaration, definition, obj["intermediates"])
 
 
