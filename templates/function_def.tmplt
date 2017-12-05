@@ -1,6 +1,6 @@
 S_TENSOR Model::{{ def_name }}({% for i in range(num_inputs-1) %}S_TENSOR input{{i}}, {% endfor %}S_TENSOR input{{ num_inputs-1 }}){
         {# Add each variable to the current context #}
-        {% for var in inputs %}ctx.add(input{{var.index0}}, "{{var}}");{% endfor %}
+        {% for var in inputs %}ctx.add(input{{loop.index0}}, "{{var}}");{% endfor %}
 
         {# Graph generation #}
         

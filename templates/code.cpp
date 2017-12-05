@@ -4,6 +4,9 @@ namespace {{ name }} {
     
     Model::Model(){
         //Handle the idx loading and graph creation in ctx
+        // Constants and Intermediates
+        {% for name, intermediate in intermediates.iteritems() %}{{ intermediate["definition"] }}
+        {% endfor %}
 
     }
     Model::~Model(){
@@ -11,7 +14,6 @@ namespace {{ name }} {
 
     }
 
-    {% for definition in definitions %}
-    {{definition}}
+    {% for definition in definitions %}{{definition}}
     {% endfor %}
 }

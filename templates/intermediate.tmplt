@@ -1,0 +1,1 @@
+{{ t_name }} = ctx.add(new RamTensor<{{ t_type }}>("{{ t_name }}));

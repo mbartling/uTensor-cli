@@ -48,7 +48,7 @@ class GraphDumper:
         obj["inputs"] = self.inputList
         obj["intermediates"] = {}
 
-        for i in G.get_intermediate_templates():
+        for i in self.get_intermediate_templates():
             obj["intermediates"][i["name"]] = i
     
         return obj

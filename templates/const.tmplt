@@ -1,0 +1,1 @@
+{{ t_name }} = ctx.add(t_import.{{ t_type }}_import("/fs/{{ t_file_path }}", "{{ t_name }}"));

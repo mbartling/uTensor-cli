@@ -5,7 +5,7 @@ import os
 import shutil
 import sys
 from tf_viewer import GraphInspector, load_graph
-
+from graph_dumper import GraphDumper, clean_name
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose", help="increase output verbosity",
                     action="store_true")
@@ -30,7 +30,7 @@ def dump_graph_constants(fName):
         if i.type == "Const":
             inspector.snap(i.name, path=bName)
 
-def generate_output_graph(tfGraph, outVar):
+def generate_output_graph(graph, fName, outVar):
     """ Given an output variable generate a uTensor graph.
         Basic idea: build a stack of operations backwards from an output variable to input variables.
         Do breadth first graph traversal.
@@ -39,35 +39,44 @@ def generate_output_graph(tfGraph, outVar):
     """
     declaration = ''
     definition = ''
+    inputs = []
 
-    inputs = ["x", "y", "z"] # Found via graph traversal
+    G = GraphDumper(fName)
+    obj = G.find_inputs(graph, outVar)
+    for m_input in obj["inputs"]:
+        inputs.append(m_input.name)
+
     with open(os.path.join("templates", "function_decl.tmplt")) as fp:
         t = Template(fp.read())
-        declaration = t.render(decl_name=outVar, num_inputs=len(inputs))
+        declaration = t.render(decl_name=outVar, num_inputs=len(inputs), inputs=inputs)
     with open(os.path.join("templates", "function_def.tmplt")) as fp:
         t = Template(fp.read())
-        definition= t.render(def_name=outVar, num_inputs=len(inputs))
-    return (declaration, definition)
+        definition = t.render(def_name=outVar, num_inputs=len(inputs), inputs=inputs, output=clean_name(graph.get_operation_by_name(outVar).outputs[0].name))
+    return (declaration, definition, obj["intermediates"])
 
 
 def generate(fName, args):
     bName = os.path.splitext(os.path.basename(fName))[0]
+    graph = load_graph(fName, name="")
     defs = []
     decls = []
+    intermediates = {}
     for mOutput in args.mOutputs:
-        (declaration, definition) = generate_output_graph(None, mOutput)
+        (declaration, definition, intermediates_l) = generate_output_graph(graph, fName, mOutput)
         defs.append(definition)
         decls.append(declaration)
+        for key in intermediates_l.keys():
+            intermediates[key] = intermediates_l[key]
 
     print("Generating: " + bName + ".hpp")
     with open(os.path.join("templates", "header.hpp")) as fp:
         t = Template(fp.read())
-        print(t.render(name=bName, declarations=decls))
+        print(t.render(name=bName, declarations=decls, intermediates=intermediates))
     
     print("Generating: " + bName + ".cpp")
     with open(os.path.join("templates", "code.cpp")) as fp:
         t = Template(fp.read())
-        print(t.render(name=bName, definitions=defs))
+        print(t.render(name=bName, definitions=defs, intermediates=intermediates))
 
 
 def main():
@@ -75,7 +84,7 @@ def main():
     if args.verbose:
         print "verbosity turned on"
 
-    #dump_graph_constants(args.file)
+    dump_graph_constants(args.file)
     generate(args.file, args)
 
 if __name__ == '__main__':
