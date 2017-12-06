@@ -44,7 +44,7 @@ class GraphDumper:
     def find_inputs(self, graph, name):
         obj = {}
         self._find_inputs(graph, name)
-    
+
         obj["opStack"] = self.opStack
         obj["inputs"] = self.inputList
         obj["intermediates"] = {}
@@ -54,7 +54,7 @@ class GraphDumper:
             obj["intermediates"][i["name"]] = i
         for i in self.get_op_templates():
             obj["operations"].append(i)
-    
+
         return obj
 
     def _find_inputs(self, graph, name):
@@ -62,7 +62,7 @@ class GraphDumper:
         # Constants should be exposed to the Model
         if p.type == "Const":
             self.constList.append(p)
-        
+
         # Placeholders are user defined inputs
         if p.type == "Placeholder":
             self.inputList.add(p)
@@ -82,9 +82,9 @@ class GraphDumper:
 #    def dump_graph_constants(self, graph, op):
 #        inspector = GraphInspector(graph)
 #        bName = os.path.splitext(os.path.basename(self.fName))[0]
-#    
+#
 #        # Handle optional quantization
-#    
+#
 #        # Assume path exists
 #        inspector.snap(op.name, path=bName)
     def get_const_templates(self):
@@ -132,20 +132,20 @@ if __name__ == '__main__':
     import pprint
     #graph = load_graph("test-models/lin_reg_model.pb", name="")
     graph = load_graph(sys.argv[1], name="")
-    
+
     G = GraphDumper(sys.argv[1])
     obj = G.find_inputs(graph, sys.argv[2])
-#    
-#    
-#    print "=========Intermediate LIST=========="
+#
+#
+#    print("=========Intermediate LIST==========")
 #    for i in G.get_intermediate_templates():
 #        print i
 #    G.get_inputs()
 
     pprint.pprint(obj)
 
-    print "==========OP stack============"
+    print("==========OP stack============")
     g = obj["opStack"]
     while g:
         op = g.pop()
-        print op.node_def
+        print(op.node_def)

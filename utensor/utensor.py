@@ -74,7 +74,7 @@ def generate(fName, args):
     with open(os.path.join("templates", "header.hpp")) as fp:
         t = Template(fp.read())
         print(t.render(name=bName, declarations=decls, intermediates=intermediates))
-    
+
     print("Generating: " + bName + ".cpp")
     with open(os.path.join("templates", "code.cpp")) as fp:
         t = Template(fp.read())
@@ -84,7 +84,7 @@ def generate(fName, args):
 def main():
     args = parser.parse_args()
     if args.verbose:
-        print "verbosity turned on"
+        print("verbosity turned on")
 
     dump_graph_constants(args.file)
     generate(args.file, args)
